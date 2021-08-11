@@ -58,12 +58,15 @@ int main() {
     ifstream myfile("test.txt");
     int temp = 0;
     int val = 0;
-    int prev = 0;
     int portb = 0;
     int retvalue = 0;
+    int upperbits = 240;//11110000 bitwise AND when val > 15
+    int largenum = 0; //variable to hold value in pb7-pb4
+    int counter = 0;
+
      //write output from reading to LED
     char myArray[strSize];//as 1 char space for null is also required
-
+    char number[1];
 
 
     if (myfile.is_open())
@@ -73,34 +76,51 @@ int main() {
             bool isnum = true;
             memset(myArray, 0, strSize);
             strcpy(myArray, argline.c_str());
+
+            counter++;
             for (int i = 0; myArray[i] != '\0'; i++)
             {
                 if (isdigit(myArray[i]))
                     temp = 1;
                 else
                 {
-                    cout << "Y" << endl;
+                    cout << "Invalid Value" << endl;
                     isnum = false;
                     break;
                 }
             }
+
             if (isnum == 1)
             {
 
                 val = stoi(argline);
 
-                // if (val > 15)
-                //     cout << "Y" << endl;
+
+                if (val > 15)
+                {
+                  // for first iteration
+                  largenum = upperbits&val;
+
+                  portb = largenum|val;
+                }
+
+                else
+                {
+                  portb = largenum|val;
+                }
+
+
+
+
 
                 char writeportb[strSize] = "sudo ./ousb io portb ";
-                strcat(writeportb, myArray);
+
+
+                sprintf(number, "%d", portb);
+                cout << number << endl;
+                strcat(writeportb, number);
                 retvalue = OUSBcommand(writeportb);
-
-                portb = prev&val;
-
-                prev = val;
-
-                cout << portb << endl;
+                memset(number, 0, 1);
                     //Sleep(100);
 
             }

@@ -1,0 +1,5 @@
+# depslib dependency file v1.0
+1628041346 source:/home/andrewapp/Documents/SWEDesign/lab1/partb.cpp
+	<iostream>
+	<fstream>
+
