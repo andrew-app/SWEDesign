@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <windows.h>
+#include <string.h>
+//#include <windows.h>
 
 #define strSize 256
 using namespace std;
@@ -15,19 +16,19 @@ int OUSBcommand(char* command)
     FILE* fpipe;
     char line[strSize] = {};
 
-    fpipe = (FILE*)_popen(command, "r");
+    fpipe = (FILE*)popen(command, "r");
     if (fpipe != NULL)
     {
         while (fgets(line, sizeof(line), fpipe))
         {   // do nothing here, or print out debug data
             //cout << line; // print out OUSB data for debug purposes
         }
-        _pclose(fpipe);   // close pipe
+        pclose(fpipe);   // close pipe
 
         // caller can see whole ousb string in str so any errors can be detected
-        strcpy_s(command, strSize, line);
+        strcpy(command, line);
     }
-    else strcpy_s(command, strSize, "Error, problems with pipe!\n");
+    else strcpy(command, "Error, problems with pipe!\n");
 
     char checktxt[50] = "Device not found";
 
@@ -57,19 +58,21 @@ int main() {
     ifstream myfile("test.txt");
     int temp = 0;
     int val = 0;
+    int prev = 0;
+    int portb = 0;
     int retvalue = 0;
      //write output from reading to LED
     char myArray[strSize];//as 1 char space for null is also required
 
 
-    
+
     if (myfile.is_open())
     {
         while (getline(myfile, argline))
         {
             bool isnum = true;
-            memset(myArray, 0, 256);
-            strcpy_s(myArray, strSize, argline.c_str());
+            memset(myArray, 0, strSize);
+            strcpy(myArray, argline.c_str());
             for (int i = 0; myArray[i] != '\0'; i++)
             {
                 if (isdigit(myArray[i]))
@@ -83,20 +86,23 @@ int main() {
             }
             if (isnum == 1)
             {
-                
+
                 val = stoi(argline);
 
-                if (val > 15)
-                    cout << "Y" << endl;
+                // if (val > 15)
+                //     cout << "Y" << endl;
 
-                else
-                {
-                    char writeportb[strSize] = "ousb -r io PORTB ";
-                    strcat_s(writeportb, myArray);
-                    retvalue = OUSBcommand(writeportb);
-                    cout << val << endl;
-                    Sleep(100);
-                }
+                char writeportb[strSize] = "sudo ./ousb io portb ";
+                strcat(writeportb, myArray);
+                retvalue = OUSBcommand(writeportb);
+
+                portb = prev&val;
+
+                prev = val;
+
+                cout << portb << endl;
+                    //Sleep(100);
+
             }
         }
         myfile.close();
