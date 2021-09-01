@@ -1,0 +1,628 @@
+/*====  Proforma : EEET2250 Lab Code Submission 1 File I/O and Bitwise Operations with OUSB =====
+
+File version: 2021_v01.1
+
+Document Revision Details:
+			version: 2021_v01.0 - Original version
+					 2021_v01.1 - Added fstream library
+
+PURPOSE:
+This file is a proforma for the EEET2250 Laboratory Code 1 Submission. This file defines the
+assessment task which is worth 10% of the available course grade - This document supersedes
+all other documents. You the student must extend this C++ program to cope with the functionality
+identified below in the GENERAL SPECIFICATIONS, SPECIFICATIONS/FUNCTIONAL REQURMENTS and ERROR
+HANDLING Sections within this document.
+
+OUSB USAGE: 
+All submissions will be tested using the OUSB Simulator that has been renamed to: ousb.exe
+This is so all student can test their code using a version of the OUSB interface which everyone has
+access too. However, DO NOT use the ousbsim command as part of your pipe code!!!  All pipe code must
+use the ousb command. If your code works with a Physical OUSB board and you are only using the PORTB,
+PINC or ADC pin 5 (adc 5) commands it should work just as well with the simulator - However it is
+recommended that all students check their code with the OUSB Simulator prior to submission.			
+
+GOAL:
+To write a C++ Win32 Console Application in Visual Studio that reads data from a file, processes the
+data, performs bitwise operations on the data, and then writes a calculated value to PORTB. When writing
+data to PORTB, the current state of the top 4 bits of PORTB (PB4-PB7) must be maintained. The program
+should perform error checking inline with the SPECIFICATIONS Section. You final program should take
+command line argument via argv[] array, read data from the designated text file and print out a well
+defined result to the console or display a value to PORTB on the OUSB Board, and nothing else. No
+additional keyboard user input should be required for the process. 
+
+Use debug mode and a breakpoint at the return statement prior to program finish in main. Do NOT use
+system("Pause"), cin, or getchar(), while(1), etc. type statements in your final solution!
+
+RESOURCES:
+	1. Lecture and tutorial notes.
+	2. Prescribed Text book and the "Teach Yourself C++ in 21 Days" PDF ebook.
+	3. The Open-USB-IO Reference manual (PDF file on canvas under the "OUSB Board Resources" page 
+	3. The ousbsim.exe file on canvas, which will provide the simulated OUSB Board functionality. 
+	   However, you will need to rename the ousbsim.exe file to ousb.exe so that it replaces the
+	   real one ousb.exe interface application.
+
+	   Note: If you have a physical OUSB board you can do the whole assignment with the real ousb.exe
+	   interface file as long as you do not use any other registers arguments are than: PORTB, PORTD
+	   PINC or ADC pin 5 (adc 5).
+
+WARNINGS:
+Avoid losing 10% by making sure the cout statement within the if (argc==1) code block in main()
+correctly executes to print out your details: incorrect student number or email will
+result in a penalty.
+
+You should not include the 's' in front of your student number and your email address should match
+the student number and your email address should be in the correct format with the correct rmit.edu
+domain address structure.
+	
+If your code, when run without any command line arguments, does not print out the correct cout
+statement (with your details) to the console, you will lose a flat 10% off your final mark. That is,
+if your code scores 54% and the cout information is incorrect your code will be reduced by a further
+10% to a final mark of 44%.
+
+Make sure you check the output of the if (argc==1) cout statement before you submit your final solution!!!!
+
+SUBMISSION:
+You will be required to rename this *.cpp to the following format:
+	lab1_1234567.cpp
+where the numbers 1234567 are your student number.
+
+The file should then be uploaded via Canvas before the due date and time. You are only required
+to upload this submission as a *.cpp file using the correct naming convention. No report is 
+required - only the *.cpp file which you have created.
+
+Note: If you re-submit your solution to Canvas, it will be automatically be renamed with -1 or -2,
+etc. attached to the end of your file. You can submit multiple times, however only your last
+submission will count.
+
+Note: 10 marks (i.e. 10% of available marks) per 24-hour period penalty will apply to late submissions
+(inclusive of weekends and public holidays). Therefore if you submit 1 minutes late, a flat 10% mark 
+penalty will be applied. Your last submission will be the file that is assessed and that submission
+time will be used to determine the late penalty.	   
+	
+MARKING:
+Your code will not be modified at all and must compile as received. Code that fails to compile will
+score 0%. Penalties for late marks and missing or erroneous if (argv==1) cout statements will be applied
+to the final mark generated by the autotester. Lowest possible score is 0% - no negative marks.
+
+Marking has several components-
+	1. your code will be checked for functionality.
+	2. your code will be tested with erroneous input.
+
+PLAGIARISM:
+The submission must be your code solution in its entirety. If your code is found to be similar to
+another submission it will be investigated for possible Academic Misconduct. Please respect the
+academic process and make sure your submission complies with RMIT's Student Conduct Policy. See:
+https://www.rmit.edu.au/about/governance-and-management/policies/student-conduct-policy
+*/
+/*
+___________________________________________________________________________________________
+___ GENERAL SPECIFICATIONS (Mostly common to all three EEET2250 Laboratory Code Submissions):
+
+G1.	You must rename your file to lab1_1234567.cpp, where 1234567 is your student number.
+Your filename MUST NEVER EVER contain any spaces.  _under_score_is_Fine.
+You do not need to include the 's' in front of your student number. Canvas will rename you
+submission by adding a -1, -2 etc. if you resubmit your solution file - This is acceptable.
+
+G2.	Edit the name/email address string in the main() function to your student number,
+student email and student name.	The format of the student ID line is CSV (Comma Separated
+Variables) with NO SPACES-
+student_id,student_email,student_name
+When the program is run without any operands i.e. simply the name of the executable such as:
+lab1_1234567.exe
+the program MUST print student ID string in Comma Separated Values (CSV) format with no
+spaces. For example the following text should be outputted to the console updated with
+your student details:
+"1234567,s1234567@student.rmit.edu.au,FirstName_LastName"
+
+G3.	All outputs are a binary representation of an integer or a single character error
+indicator followed by a linefeed ( endl or \n).
+
+G4.	DO NOT add more than what is specified. Do NOT add additional information, text or
+comments to the output console.
+
+G5.	DO NOT use 'cin', system("pause"), getchar(), gets(), etc. type functions. Do NOT ask
+for user input from the keyboard. All input MUST be specified on the command line separated
+by blank spaces (i.e. use the argv and argc input parameters).
+
+G6. DO NOT use the characters:  * / \  : ^ ? in your command line arguments as your user
+input. These are special character and may not be processed as expected, potentially
+resulting in undefined behaviour of your program.
+
+G7.	All input and output is case sensitive.
+
+G8.	You should use the Integrated Debugging Environment (IDE) to change input arguments during
+the development process.
+
+G9.	When your code exits the 'main()' function using the 'return' command, you MUST
+use zero as the return value. This requirement is for exiting the 'main()' function ONLY.
+A return value other than zero will indicate that something went wrong to the autotester and
+no marks will be awarded.
+
+G10. User-defined functions and/or class declarations must be written before the 'main()'
+function. This is a requirement of the Autotester and failure to do so will result in your code
+scoring 0% as it will not be compiled correctly by the autotester. Do NOT put any functions/class
+definitions after the 'main()' function or modify the comments and blank lines at the end of this
+file.
+
+G11. You MUST run this file as part of a Project - No other *.cpp or *.h files should be added
+to your solution.
+
+G12. You are not permitted to add any other #includes statements to your solution. The only
+libraries permitted to be used are the ones predefined in this file.
+
+G13. If an error (as per the definition in this specification) occurs, then the value on
+the OUSB PORTB (LEDs) must not to be updated.
+
+G14. All numerical values read from / written to the simulated or real OUSB Board are considered
+to be unsigned integers and are between 0 to 255 (inclusive) for PORTB type registers and 0 to 1023
+for ADC type registers.
+
+G15. Any binary numbers within this document have the prefix 0b. This notation is used to avoid
+confusion between decimal, hexadecimal and binary number formats within the description and
+specification provided in this document. For example the number 10 in decimal could be written
+as 0xA in hexadecimal or 0b1010 in binary. It can equally be written with leading zeroes such
+as: 0x0A or 0b00001010. For output to the console screen you should only ever display the
+numerical characters only and omit the 0x or 0b prefixes.
+
+G16. If any binary conversions are requried in your solution, the conversion to binary must occur
+in your code, not by using the -b switch as part of the OUSB.exe application. The '-b' flag will
+not be supported by the AutoTester.
+
+G17. Do NOT attempt to read/write to any other OUSB Board IO port other than PORTB 0-7, PINC 0-7,
+ADC pins 0 through to 6 and the PWM pin 1 (on port D). Other pins on the OUSB board are
+reserved for the autotester, rs-232 port and the USB interface back to the computer.
+*/
+/*
+______________________________________________________________________________________________________________
+___ SPECIFICATIONS/FUNCTIONAL REQURMENTS:
+
+Your program must read in data from a text file, where the filename is entered as a parameter on the command
+line. (Filename entered on the command line must include the file extension i.e., do not assume a file extension
+in your code). YOUR CODE WILL BE TESTED WITH MULTIPLE INPUT TEXT FILES, so do not hard-code the filename into
+your solution!!! 
+
+Valid data read from the file should then be processed a value generated by the file together with the current
+state of PORTB should be written back out to PORTB. The requirement is to maintain the current state of
+the top four bits of PORTB (PB4-PB7) and use the value within the file to modify the lower four bits of PORTB
+(PB0-PB3). The file containing valid data will only have one data value per line. Valid numbers in the file
+include values from 0-15 inclusive only (i.e., only the values for the bottom four bits of PORTB). Your program
+must continue reading in each line of data and writing valid data to PORTB until the end of the file is reached
+while detecting any errors and correctly maintain the top four bits of PORTB.
+
+Your code will need to perform error checking to ensure that data read in from the file only represents number
+between 0 and 15 decimal, inclusive. Any data outside of the accepted range of 0-15 will generate an error code
+to the console and no modification of PORTB should occur as a result of that data item.  You code should then
+continue to read in the next line in the file and process it until the end of the file is reached.
+ 
+The top four bits of PORTB (PB4-PB7) must not be changed when you write data to PORTB - use bitwise
+operations to do this.
+
+Hint: 	- you can use a bitwise AND (to read the important bits of PORTB) then bitwise OR (to set the new 
+		  bits on PORTB).
+
+Your program MUST use pipes to communicate with the OUSB board, system calls are NOT allowed: 
+Example of system calls which are NOT allowed: system("ousb -r io portb 127"); 
+
+System calls take longer and automatically echo the result to the command shell window. If you use system
+calls in your code it is likely the code will not meet the required specifications and you will most likely
+lose all marks for this assessment item. Therefore, you MUST write code using pipes to access the OUSB.exe
+functionality. See the code fragments given to you and explained in lectures and in the sample files on Canvas. 
+
+For every '_popen(command,"r"); ' call you MUST close the pipe using '_pclose(<pipename>); '. Otherwise you
+program is likely to suffer from a memory leak and your program might not be able to run correctly when the
+autotester executes it 100's of times over.
+
+About pipes and _popen:
+http://www.cplusplus.com/forum/windows/1341/
+http://www.cplusplus.com/forum/windows/10766/
+
+*/
+/*
+______________________________________________________________________________________________________________
+___ ERROR HANDLING:
+
+Error checking is a big part of software development. You cannot always expect a user to use your program
+as you intended. Therefore you should implement the following ERROR CHECKS in your solution.  
+
+	Hint: -	Implement the error checks in the order they appear below as each check is harder to implement
+			than the previous one. 
+		  - The following text lists errors you must detect and a priority of testing.  NB: order of testing
+			is important. 
+
+All outputs are a single character followed by a newline ( endl or \n). DO NOT add more than what is specified,
+do NOT add additional information, simply and only the output as required. DO NOT use 'cin', do NOT ask for user
+input. This includes system("pause") or getchar(), etc. function calls. All input MUST be read in from the command
+line arguments and/or from file only. 
+
+The closing } of the main statement must be the last closing brace in the file. The last line containing
+"main()" must be the main statement where execution is started. In other words: ALL your functions MUST be
+between the start of the file and the int main(int argc, char *argv[]) function. Do NOT put any functions
+after the main function, if you use functions add them BEFORE the 'main' function.
+
+When your code exits the 'main()' function using the 'return' command then you MUST use zero as the return
+value. This requirement is for exiting the 'main()' function ONLY. Anything other than return 0, will indicate
+to the autotester that an error occurred during the testing process of your code and you will receive no
+marks for that test.
+
+Common error: Zero and the capital letter 'O' may look the same/similar but are not the same in ASCII.
+                
+The basic programming rules of error checking are simple:
+1) check that the input is valid.
+2) check that the output is valid.
+3) if any library function returns an error code USE IT !!! CHECK FOR IT !!! If that means more than 70%
+   of your code is error checking, then that's the way it has to be.
+						
+			
+ERROR CHECK 1:   NUMBER OF PARAMETERS 
+If the no command line input parameters are passed to your solution, then your solution MUST print student
+ID string in CSV format as explained above and then exit by returning 0 in main(). Nothing other and the
+student ID string should be printed to the console. This should be the first thing you do before starting
+to tackle the problem.
+
+If one (1) command line input argument is passed to your solution, the second parameter in argv[] is taken
+to be the filename of which your solution should work on.
+
+NOTE: The name of the program counts as the 1st parameter (0th value in the argv[] array). 
+
+If more than (1) command line input argument is passed to your solution, the output shall be 'P' which
+signals a parameter error has occurred.  Your solution should print 'P' to the console and return 0; from 
+main() and exit. Nothing other than P will be printed to the console output.
+
+Example 1:
+your solution is executed with the following
+	Lab1_1234567.exe myFile.txt
+Your solution will process the data within the myFile.txt file as per the specifications outlined in the
+previous section.
+
+Example 2:
+your solution is executed with the following
+	Lab1_1234567.exe myFile.txt 56
+Your solution detect that more than 1 input argument as been passed and it will print the following line:
+P
+Nothing other than P will appear on the console and your solution should return 0; and exit. No modification
+of the OUSB Board's PORTB should occur.
+
+
+ERROR CHECK 2:   INVALID FILE 
+If the file cannot be opened using first input command line argument (which should be the filename), the
+output shall be 'F' and the program should exit. This could occur if the file does not exist or if your 
+solution is blocked from opening it by the operating system.
+
+
+ERROR CHECK 3:   VALID NUMBER RANGE 
+If the data read from file contains a number beyond the accepted range (i.e., 0-15, inclusive), the output
+shall be 'Y'. Then your solution should continue operating i.e., keep reading in data from the next line and
+writing data to PORTB. For any given line in the file that contains an invalid number, no modification of the
+OUSB Board should be completed. Hence PORTB should maintain its state until the next line contains a valid
+number.
+
+Example 3:
+Examples of a file containing all valid values (one value per line in a real file): 6 0 15 9 12
+will produce no console output at all, however the final state of the OUSB Board PORTB register will be 12.
+
+Example 4:
+Examples of a file containing some invalid values (one value per line in a real file): 6 0 15 9.6 14
+will produce the following console output:
+Y
+and the final state of the OUSB Board PORTB register will be 14.
+
+Example 5:
+Examples of a file containing all invalid data (one value per line in a real file): 16 -4 8.54 8v +6 127 b u7
+will produce the following console output:
+Y
+Y
+Y
+Y
+Y
+Y
+Y
+Y
+In this case if PORTB had a value of 12 before your solutions was executed with an input file containing all
+invalid data, PORTB of the OUSB Board will still be set to 12 after your solution finished executing.
+
+
+ERROR CHECK 4:   ANYTHING ELSE THAT CAN GO WRONG (MURPHY'S LAW TEST)
+If there are any other kinds of errors not covered here, the output shall be 'Z'. That is:  anything else
+that can possibly go wrong and has not be explicitly tested for or covered under the tests above,
+for example: 
+- no OUSB connection, 
+- disconnection during operation
+- HW dead. 
+- ???? anything else Murphy can dream up. 
+- everything that has not been covered elsewhere is Murphy's domain.
+
+Note: The OUSB.exe will give a message "Fatal Exception" if the board is not connected or is disconnected
+during normal operation. This message should NOT be returned by your code. The only output your code
+should give is the single character: 'Z' 
+
+However, Murphy's laws are hard to test for. Very hard to test for with autotester, however it is possible.
+Suggestion: only worry about this test if you have clearly covered ALL preceding tests!
+
+Error precedence:
+If multiple errors occur during a program execution event, your program should only display
+one error code followed by a newline character and then exit (using a return 0; statement).
+The exception to this rule is the 'Y' character for a invalid data item in the input file.
+
+In general, the precedence of the error reported to the console should be displayed in the
+order that they appear within this proforma. However to clarify the exact order or precedence
+for the error characters, the precedence of the displayed error code should occur in this order:
+	'P' - Incorrect number of input command line arguments (see M4)
+	'F' - Error opening file
+	'Y' - Invalid data read in from file.  This is the only error code that can be displayed multiple times.
+	'Z' - MURPHY'S LAW (undefined error)
+	
+Therefore, if an invalid filename is passed to your solution and the OUSB Board is disconnected,
+the first error code should be displayed to the console, which in this case would be 'F'. Displaying
+'Z' in this case would result in a loss of marks.
+
+Note: If multiple 'Y' errors occur, your solution should display each Y error code on a separate line.
+Displaying "YYYY" on the same line will result in a loss of marks.
+
+___________________________________________________________________________________________
+___ HINTS:
+
+ *  Marking will result from testing your program against a whole range of inputs. The secret to getting a
+    good mark is to carefully analyse all possible errors and odd situations BEFORE you write the code so
+	read the project definition VERY carefully.  Ensure in each circumstance you can detect the error or
+	condition and report the appropriate result.  Hint: write test cases before you write any code.
+
+ *  When text output is required you must generate EXACTLY that output and no other output. For example-
+    Specified output: "Y"    Actual program output: "error Y"  Result: zero marks.
+    Specified output: "P"    Actual program output: "Got P"    Result: zero marks.
+    Specified output: "Z"    Actual program output: " Z"       Result: zero marks.
+	
+ *  For every line that is in a valid file (i.e. one that opens), your solution should either write
+    a value to the OUSB Board PORTB register or display and error code to the console output, however
+	it should not do both.
+	
+ *	The following code is an example of the syntax required to open a pipe to the device.
+    It may / may not include all of the necessary code to complete the task.
+	
+//----Start of template standalone .cpp file--------------------------------------------
+// This example writes the value 20 to the PORTB of the OUSB Board
+//
+	#include <iostream>
+	#define Debug 1
+	using namespace std;
+	int main(int argc, char* argv[])
+	{
+		char command[256] = {};
+		strcpy_s(command, "ousb -r io PORTB 20"); // command to write 20 to OUSB board
+
+		FILE *fpipe;
+		char line[250] = {}; // size of Line should be smaller than command
+
+		fpipe = (FILE*)_popen(command,"r");    // attempt to open pipe and execute a command
+		if( fpipe != NULL )					   // check that the pipe opened correctly
+		{
+			while( fgets(line, sizeof(line), fpipe) )
+			{   // do nothing here, or print out debug data
+				if (Debug) cout << line; // print out OUSB data for debug purposes
+			}
+			_pclose(fpipe);   // close pipe
+		}
+		else cout << "Error, problems with pipe!\n";
+
+		// do something with the value returned by the OUSB board, eg:
+		unsigned short portb = (unsigned short)atoi(line); // convert from char array to unsigned short
+		cout << "value = " << portb << endl;
+
+		return 0;
+	}
+//----End of template standalone .cpp file----------------------------------------------
+____________________________________________________________________________________________
+*/
+// These are the libraries you are allowed to use to write your solution. Do not add any
+// additional libraries as the auto-tester will be locked down to the following:
+#include <iostream>
+#include <cstdlib>
+#include <time.h>
+#include <math.h>
+#include <errno.h>   
+#include <string>
+#include <sstream>
+#include <fstream>
+#include <windows.h> // keep it here, just in case.
+
+// Do NOT Add or remove any #include statements to this project!!
+// All library functions required should be covered by the above
+// include list. Do not add a *.h file for this project as all your
+// code should be included in this file.
+
+using namespace std;
+
+const double MAXRANGE = 255;
+const double MINRANGE = 0;
+
+// All functions to be defined below and above main()  - NO exceptions !!!  Do NOT
+// define function below main() as your code will fail to compile in the auto-tester.
+
+
+
+// WRITE YOUR FUNCTION PROTOTYPES HERE (OPTIONAL, however if you write lots of functions
+// having a prototype list will mean that they can be written in any order)
+
+
+
+// WRITE ANY USER DEFINED FUNCTIONS HERE (optional)
+
+int ReadPORTB();
+void WritePORTB(int val);
+
+int ReadPORTB()
+{
+    int portb = 0;
+
+    const char* command = "ousb -r io PORTB";  // must be const
+    FILE* fpipe;
+    char line[256] = {};
+
+    fpipe = (FILE*)_popen(command, "r");
+    if (fpipe != NULL)
+    {
+        while (fgets(line, sizeof(line), fpipe))
+        {   // do nothing here, or print out debug data
+            // cout << line; // print out OUSB data for debug purposes
+        }
+        _pclose(fpipe);   // close pipe
+    }
+    else cout << "Error, problems with pipe!\n";
+
+    string checktxt("Device not found");
+
+    string debug(line); //copy char array of ousb.exe output to a string
+
+    int value = 0;
+
+    value = (int)atoi(line);
+
+    if (debug.find(checktxt) != string::npos) {
+
+        portb = -1;
+        
+        
+    }
+    else
+    {
+        // convert value from char array to int
+        portb = (int)atoi(line);
+    }
+    return portb;
+}
+
+void WritePORTB(int val)
+{
+
+    char command[256] = { "ousb -r io PORTB " };
+    char val_string[256] = {};
+
+    // Convert portb integer to character array (in base 10)
+
+    _itoa_s(val, val_string, 10);
+    // append the value to write to portb to the Command string
+    strcat_s(command, val_string);
+
+    FILE* fpipe;
+    char line[256];
+
+    fpipe = (FILE*)_popen(command, "r");
+    if (fpipe != NULL)
+    {
+        while (fgets(line, sizeof(line), fpipe))
+        {   // do nothing here, or print out debug data
+            // cout << line; // print out OUSB data for debug purposes
+        }
+        _pclose(fpipe);   // close pipe
+    }
+
+    else cout << "Error, problems with pipe!\n";
+
+
+}
+
+
+// all function definitions and prototypes to be defined above this line
+int main(int argc, char *argv[])
+{
+	// ALL CODE (excluding variable declarations) MUST come after the following 'if' statement
+	if (argc == 1)
+    {
+        cout << "3680442,s3680442@student.rmit.edu.au,Andrew_Appuhamy" << endl;
+
+        return 0;
+    }
+
+    if (argc > 2) {
+        cout << "P" << endl;
+        return 0;
+    }
+
+    string argline;
+    ifstream myfile(argv[1]);
+    int val = 0;
+    int val_arg = 0;
+    int temp = 0; //value from text file
+    int portb = 0;
+    int val_ret = 0;
+    int upperbits = 0xF0;//0b11110000
+    char myArray[256] = {};
+
+
+    
+    portb = ReadPORTB();
+
+    if (portb > 15)
+    {
+        temp = upperbits & portb;
+    }
+
+    if (myfile.is_open())
+    {
+        while (getline(myfile, argline))
+        {
+            bool isnum = true;
+
+            
+            memset(myArray, 0, 256);
+            strcpy_s(myArray, 256, argline.c_str());
+
+
+
+            for (int i = 0; myArray[i] != '\0'; i++)
+            {
+                if (isdigit(myArray[i]))
+                    (void)0;
+                else
+                {
+                    cout << "Y" << endl;
+                    isnum = false;
+                    break;
+                }
+            }
+
+            if (isnum == true)
+            {
+
+                val_arg = stoi(argline);
+
+
+                if (val_arg > 15)
+                {
+                    cout << "Y" << endl;
+                }
+
+                else
+                {
+
+                    
+
+                    val = val_arg | temp;
+
+                    WritePORTB(val);
+                    
+                    val_ret = ReadPORTB();
+
+                    if (val_ret == -1)
+                    {
+                        cout << "Z" << endl;
+                        return 0;
+                    }
+                    Sleep(500);
+                }
+
+            }
+        }
+        myfile.close();
+    }
+
+    else cout << "F" << endl;
+
+    return 0;
+}
+
+
+// No code to be placed below this line - all functions to be defined above main() function.
+// End of File  - DO NOT Modify this line or anything below this line
+
+
+

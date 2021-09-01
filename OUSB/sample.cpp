@@ -18,14 +18,14 @@ int ReadPortB()
 	FILE *fpipe;
 	char line[256];
 
-	fpipe = (FILE*)popen(command, "r");
+	fpipe = (FILE*)_popen(command, "r");
 	if (fpipe != NULL)
 	{
 		while (fgets(line, sizeof(line), fpipe))
 		{   // do nothing here, or print out debug data
 			// cout << line; // print out OUSB data for debug purposes
 		}
-		pclose(fpipe);   // close pipe
+		_pclose(fpipe);   // close pipe
 	}
 	else cout << "Error, problems with pipe!\n";
 
@@ -51,14 +51,14 @@ void WritePortB(int val)
 	FILE *fpipe;
 	char line[256];
 
-	fpipe = (FILE*)popen(command, "r");
+	fpipe = (FILE*)_popen(command, "r");
 	if (fpipe != NULL)
 	{
 		while (fgets(line, sizeof(line), fpipe))
 		{   // do nothing here, or print out debug data
 			// cout << line; // print out OUSB data for debug purposes
 		}
-		pclose(fpipe);   // close pipe
+		_pclose(fpipe);   // close pipe
 	}
 	else cout << "Error, problems with pipe!\n";
 }

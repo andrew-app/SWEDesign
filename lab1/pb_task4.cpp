@@ -1,13 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstring>
 #include <windows.h>
+
 #define stdSize 256
 using namespace std;
 
 int OUSBcommand(char* command);//function prototype
-
-
 
 int OUSBcommand(char* command)
 {
@@ -24,9 +24,9 @@ int OUSBcommand(char* command)
         _pclose(fpipe);   // close pipe
 
         // caller can see whole ousb string in str so any errors can be detected
-        strcpy_s(command, stdSize,line);
+        strcpy_s(command, stdSize, line);
     }
-    else strcpy_s(command, stdSize,"Error, problems with pipe!\n");
+    else strcpy_s(command, stdSize, "Error, problems with pipe!\n");
 
     char checktxt[50] = "Device not found";
 
@@ -43,8 +43,6 @@ int OUSBcommand(char* command)
 
     }
 
-
-
     // convert value from char array to int
 
     return value;
@@ -54,27 +52,38 @@ int OUSBcommand(char* command)
 int main(int argc, char* argv[]) {
     string argline;
     ifstream myfile(argv[1]);
-    int val = 0; //value from text file
-    int portb = 0; //value sent to port b
-    int retvalue = 0;// value returned from ousb command function
-    int upperbits = 240;//11110000 bitwise AND when val > 15
-    int largenum = 0; //variable to hold value from pb7-pb4
-  
+    int val = 0;
+    int val_arg = 0;
+    int temp = 0; //value from text file
+    int portb = 0;
+    int val_ret = 0;
+    int upperbits = 0xF0;//0b11110000
+    char readportb[stdSize] = "ousb -r io portb ";
+    char myArray[stdSize] = {};
+    char number[stdSize] = {};
+    if (argc > 2) {
+        cout << "Incorrect number of command line arguments" << endl;
+        return 0;
+    }
+    
+    portb = OUSBcommand(readportb);
 
-    //write output from reading to LED
-    char myArray[stdSize];//as 1 char space for null is also required
-    char number[stdSize];
-
+    if (portb > 15)
+    {
+        temp = upperbits & portb;
+    }
 
     if (myfile.is_open())
     {
         while (getline(myfile, argline))
         {
             bool isnum = true;
+
+            
             memset(myArray, 0, stdSize);
             strcpy_s(myArray, stdSize, argline.c_str());
 
-           
+
 
             for (int i = 0; myArray[i] != '\0'; i++)
             {
@@ -88,44 +97,41 @@ int main(int argc, char* argv[]) {
                 }
             }
 
-            if (isnum == 1)
+            if (isnum == true)
             {
 
-                val = stoi(argline);
+                val_arg = stoi(argline);
 
 
-                if (val > 15)
+                if (val_arg > 15)
                 {
-                    // for first iteration
-                    largenum = upperbits & val;
-
-                    portb = largenum | val;
+                    cout << "Out of Range Value" << endl;
                 }
 
                 else
                 {
-                    portb = largenum | val;
+
+                    char writeportb[stdSize] = "ousb io portb ";
+
+                    val = val_arg | temp;
+
+                    
+                    memset(number, 0, stdSize);
+
+                    _itoa_s(val,number,stdSize,10);
+                    
+
+                    strcat_s(writeportb, number);
+
+                    val_ret = OUSBcommand(writeportb);
+
+                    if (val_ret != -1)
+                    {
+                        cout << val << endl;
+                    }
+                    
+                    Sleep(500);
                 }
-
-
-
-
-
-                char writeportb[stdSize] = "ousb io portb ";
-
-            
-                _itoa_s(portb, number, stdSize, 10);
-
-
-                cout << number << endl;
-
-                strcat_s(writeportb, number);
-
-                retvalue = OUSBcommand(writeportb);
-
-                memset(number, 0, stdSize);
-
-                Sleep(100);
 
             }
         }
