@@ -104,36 +104,41 @@ void TargetADC(int val)
 
 	SetPWM(DC);
 
-	int CurrentADC0 = ReadADC0();
+	int CurrentADC0 = 0;
 	int i = 1;
-	int action;
+
 	while (val != CurrentADC0)
 	{
 		CurrentADC0 = ReadADC0();
 
 		
 
-		action = rand() % 2;
+		
 
-		if (action == 0)
+		if (CurrentADC0 > val)
 		{
 			SetPWM(DC);
 			DC++;
 		}
 
-		
-		else if (action == 1)
+
+		else if (CurrentADC0 < val)
 		{
-			
+
 			SetPWM(DC);
 			DC--;
 		}
 
+		else
+			cout << "Target Reached." << endl;
 
 		cout << "Loop# " << i << " ADC target = " << val << " ADC read: " << CurrentADC0 << " Next PWM " << DC << endl;
 
 		if (i == 60)
+		{
+			cout << "Calibration exhausted. Target not met." << endl;
 			break;
+		}
 		i++;
 		Sleep(1000);
 	}
@@ -141,7 +146,7 @@ void TargetADC(int val)
 
 }
 
-void errorcheck(char* temp,string arg) {
+int errorcheck(char* temp,string arg) {
 	for (int i = 0; temp[i] != '\0'; i++)
 	{
 		if (isdigit(temp[i]))
@@ -149,9 +154,10 @@ void errorcheck(char* temp,string arg) {
 		else
 		{
 			cout << "Invalid " << arg << endl;
-			return;
+			exit(0);
 		}
 	}
+	return atoi(temp);
 	
 }
 
@@ -180,22 +186,21 @@ int main(int argc, char* argv[])
 
 	
 
-	if (arg1 == "A")
+	if (arg1 == "A") //ADC
 	{
-		errorcheck(arg2, Param[arg1]);
-		ReadUADC(atoi(arg2));
+		
+		ReadUADC(errorcheck(arg2, Param[arg1]));
 	}
 
-	else if (arg1 == "P")
+	else if (arg1 == "P") // PWM
 	{
-		errorcheck(arg2, Param[arg1]);
-		SetPWM(atoi(arg2));
+		
+		SetPWM(errorcheck(arg2, Param[arg1]));
 	}
 
-	else if (arg1 == "L")
+	else if (arg1 == "L") //Target ADC
 	{
-		errorcheck(arg2, Param[arg1]);
-		TargetADC(atoi(arg2));
+		TargetADC(errorcheck(arg2, Param[arg1]));
 	}
 
 
