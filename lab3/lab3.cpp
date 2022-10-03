@@ -44,7 +44,7 @@ class OUSB
 
 
 
-class trafficLight
+class trafficLight: public OUSB
 {
 	private:
 		bool redLight;
@@ -59,6 +59,8 @@ class trafficLight
 		}
 
 		void setredLight() {
+			OUSB temp;
+			temp.setPORTB(1);
 			redLight = true;
 			yellowLight = false;
 			greenLight = false;
@@ -66,6 +68,8 @@ class trafficLight
 		bool isRed() { return redLight ? true : false; };
 
 		void setyellowLight() {
+			OUSB temp;
+			temp.setPORTB(6);
 			redLight = false;
 			yellowLight = true;
 			greenLight = false;
@@ -74,9 +78,11 @@ class trafficLight
 		bool isYellow() { return yellowLight ? true : false; };
 
 		void setgreenLight() {
+			OUSB temp;
+			temp.setPORTB(8);
 			redLight = false;
 			yellowLight = false;
-			greenLight = true; 
+			greenLight = true;
 		};
 		bool isGreen() { return greenLight ? true : false; };
 };
@@ -93,14 +99,14 @@ string OUSB::command(string *str)
 	FILE* fpipe;
 	char line[256] = {};
 
-	fpipe = (FILE*)_popen(str->c_str(), "r");
+	fpipe = (FILE*)popen(str->c_str(), "r");
 	if (fpipe != NULL)
 	{
 		while (fgets(line, sizeof(line), fpipe))
 		{   // do nothing here, or print out debug data
 			// cout << line; // print out OUSB data for debug purposes
 		}
-		_pclose(fpipe);   // close pipe
+		pclose(fpipe);   // close pipe
 	}
 	else cout << "Z" << endl;
 
@@ -119,24 +125,24 @@ string OUSB::command(string *str)
 }
 
 unsigned int OUSB::getPORTA() {
-	string commandPORTA = "ousb -r io porta";
+	string commandPORTA = "sudo ./ousb -r io porta";
 	portA = (unsigned int)stoi(command(&commandPORTA));
 	return portA;
 }
 
 void OUSB::setPORTB(unsigned int val) {
-	string commandPORTB = "ousb -r io portb " + to_string(val);
+	string commandPORTB = "sudo ./ousb -r io portb " + to_string(val);
 	portB = stoi(command(&commandPORTB));
 }
 
 unsigned int OUSB::getPORTC() {
-	string commandPORTA = "ousb -r io portc";
+	string commandPORTA = "sudo ./ousb -r io portc";
 	portC = (unsigned int)stoi(command(&commandPORTA));
 	return portC;
 }
 
 void OUSB::setPORTD(unsigned int val) {
-	string commandPORTD = "ousb -r io portd " + to_string(val);
+	string commandPORTD = "sudo ./ousb -r io portd " + to_string(val);
 	portD = stoi(command(&commandPORTD));
 }
 
@@ -146,7 +152,7 @@ int main()
 {
 	OUSB obj;
 	obj.setPORTB(0);
-	obj.setPORTD(0);
+	// obj.setPORTD(0);
 
 	cout << "portA: " << obj.getPORTA() << endl;
 	cout << "portB: " << obj.getPORTB() << endl;
