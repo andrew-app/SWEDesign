@@ -1,5 +1,3 @@
-// lab3.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
 
 #include <iostream>
 #include <string>
@@ -10,103 +8,81 @@ using namespace std;
 
 class OUSB
 {
-	private:
-		unsigned int portA;
-		unsigned int portB;
-		unsigned int portC;
-		unsigned int portD;
-		string command(string* str);
-		
-	public:
-		OUSB() {
-			portA = 0;
-			portB = 0;
-			portC = 0;
-			portD = 0;
-		};
+private:
+	unsigned int portA;
+	unsigned int portB;
+	unsigned int portC;
+	unsigned int portD;
+	string command(string* str);
 
-		unsigned int getPORTB(){
-			return portB;
-		};
+public:
+	OUSB() {
+		portA = 0;
+		portB = 0;
+		portC = 0;
+		portD = 0;
+	};
 
-		unsigned int getPORTA();
+	unsigned int getPORTA();
 
-		void setPORTB(unsigned int val);
+	unsigned int getPORTB();
 
-		unsigned int getPORTD() {
-			return portD;
-		}
+	void setPORTB(unsigned int val);
 
-		unsigned int getPORTC();
+	unsigned int getPORTC();
 
-		void setPORTD(unsigned int val);
+	unsigned int getPORTD();
+
+	void setPORTD(unsigned int val);
 };
 
+unsigned int OUSB::getPORTA() {
+	string commandPORTA = "ousb -r io porta";
+	portA = (unsigned int)stoi(command(&commandPORTA));
+	return portA;
+}
 
+unsigned int OUSB::getPORTB() {
+	string commandPORTB = "ousb -r io portb";
+	portB = (unsigned int)stoi(command(&commandPORTB));
+	return portB;
+}
 
-class trafficLight: public OUSB
-{
-	private:
-		bool redLight;
-		bool yellowLight;
-		bool greenLight;
-		
-	public:
-		trafficLight(){
-			redLight = false;
-			yellowLight = false;
-			greenLight = false;
-		}
+void OUSB::setPORTB(unsigned int val) {
+	string commandPORTB = "ousb -r io portb " + to_string(val);
+	portB = stoi(command(&commandPORTB));
+}
 
-		void setredLight() {
-			OUSB temp;
-			temp.setPORTB(1);
-			redLight = true;
-			yellowLight = false;
-			greenLight = false;
-		}
-		bool isRed() { return redLight ? true : false; };
+unsigned int OUSB::getPORTC() {
+	string commandPORTC = "ousb -r io portc";
+	portC = (unsigned int)stoi(command(&commandPORTC));
+	return portC;
+}
 
-		void setyellowLight() {
-			OUSB temp;
-			temp.setPORTB(6);
-			redLight = false;
-			yellowLight = true;
-			greenLight = false;
-		};
+unsigned int OUSB::getPORTD() {
+	string commandPORTD = "ousb -r io portd";
+	portD = (unsigned int)stoi(command(&commandPORTD));
+	return portD;
+}
 
-		bool isYellow() { return yellowLight ? true : false; };
+void OUSB::setPORTD(unsigned int val) {
+	string commandPORTD = "ousb -r io portd " + to_string(val);
+	portD = stoi(command(&commandPORTD));
+}
 
-		void setgreenLight() {
-			OUSB temp;
-			temp.setPORTB(8);
-			redLight = false;
-			yellowLight = false;
-			greenLight = true;
-		};
-		bool isGreen() { return greenLight ? true : false; };
-};
-
-void sequence(trafficLight* l) {
-	l->setgreenLight();
-	l->setyellowLight();
-	l->setredLight();
-};
-
-
-string OUSB::command(string *str)
+string OUSB::command(string* str)
 {
 	FILE* fpipe;
 	char line[256] = {};
 
-	fpipe = (FILE*)popen(str->c_str(), "r");
+	fpipe = (FILE*)_popen(str->c_str(), "r");
 	if (fpipe != NULL)
 	{
 		while (fgets(line, sizeof(line), fpipe))
 		{   // do nothing here, or print out debug data
 			// cout << line; // print out OUSB data for debug purposes
 		}
-		pclose(fpipe);   // close pipe
+		_pclose(fpipe);   // close pipe
 	}
 	else cout << "Z" << endl;
 
@@ -119,59 +95,122 @@ string OUSB::command(string *str)
 		cout << "Z" << endl;
 	}
 
-	
+
 	return output;
-	
+
 }
 
-unsigned int OUSB::getPORTA() {
-	string commandPORTA = "sudo ./ousb -r io porta";
-	portA = (unsigned int)stoi(command(&commandPORTA));
-	return portA;
-}
-
-void OUSB::setPORTB(unsigned int val) {
-	string commandPORTB = "sudo ./ousb -r io portb " + to_string(val);
-	portB = stoi(command(&commandPORTB));
-}
-
-unsigned int OUSB::getPORTC() {
-	string commandPORTA = "sudo ./ousb -r io portc";
-	portC = (unsigned int)stoi(command(&commandPORTA));
-	return portC;
-}
-
-void OUSB::setPORTD(unsigned int val) {
-	string commandPORTD = "sudo ./ousb -r io portd " + to_string(val);
-	portD = stoi(command(&commandPORTD));
-}
-
-
-
-int main()
+class trafficLight : public OUSB
 {
-	OUSB obj;
-	obj.setPORTB(0);
-	// obj.setPORTD(0);
+private:
+	bool redLight;
+	bool yellowLight;
+	bool greenLight;
 
-	cout << "portA: " << obj.getPORTA() << endl;
-	cout << "portB: " << obj.getPORTB() << endl;
-	cout << "portC: " << obj.getPORTC() << endl;
-	cout << "portD: " << obj.getPORTD() << endl;
+public:
+	trafficLight() {
+		redLight = false;
+		yellowLight = false;
+		greenLight = false;
+	}
+	
+	void setRed();
+
+	bool isRed() { return redLight ? true : false; };
+
+	void setYellow();
+
+	bool isYellow() { return yellowLight ? true : false; };
+
+	void setGreen();
+
+	bool isGreen() { return greenLight ? true : false; };
+
+	void initState(string &colour);
+
+	void setState();
+};
+
+void trafficLight::setRed() {
+	setPORTB(1);
+	redLight = true;
+	yellowLight = false;
+	greenLight = false;
+}
+
+void trafficLight::setYellow() {
+	setPORTB(6);
+	redLight = false;
+	yellowLight = true;
+	greenLight = false;
+};
+
+void trafficLight::setGreen() {
+	setPORTB(8);
+	redLight = false;
+	yellowLight = false;
+	greenLight = true;
+};
+
+void trafficLight::initState(string &colour) {
+	if (colour == "R") setRed();
+	else if (colour == "Y") setYellow();
+	else if (colour == "G") setGreen();
+};
+
+void trafficLight::setState() {
+	if (isRed()) setGreen();
+	else if (isYellow()) setRed();
+	else if (isGreen()) setYellow();
+};
+
+
+int main(int argc, char* argv[])
+{
+	if (argc != 3) {
+		cout << "Incorrect # of args" << endl;
+		return 0;
+	}
 
 	trafficLight light;
 
-	sequence(&light);
+	string colour = argv[1];
 
-	if (light.isGreen()) {
-		cout << "GOOOO!!!" << endl;
+	cout << colour << endl;
+
+	if (colour == "R" || colour == "r") {
+		colour = "R";
 	}
 
-	else if (light.isYellow()) {
-		cout << "SLOW.." << endl;
+	else if (colour == "Y" || colour == "y") {
+		colour = "Y";
+	}
+
+	else if (colour == "G" || colour == "g") {
+		colour = "G";
 	}
 
 	else {
-		cout << "STOP!!!" << endl;
+		cout << "invalid first arg" << endl;
+		return 0;
 	}
+
+	int transitions = atoi(argv[2]);
+
+	if (transitions > 50 || transitions < 0)
+	{
+		cout << "invalid # of state transitions" << endl;
+
+		return 0;
+	}
+
+	light.initState(colour);
+
+	for (int i = 0; i <= transitions; i++) {
+
+		light.setState();
+	}
+	
+	return 0;
+	
 }
