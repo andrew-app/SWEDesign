@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <string>
-
+#include <windows.h>
 using namespace std;
 
 
@@ -9,11 +9,11 @@ using namespace std;
 class OUSB
 {
 private:
-	unsigned int portA;
-	unsigned int portB;
-	unsigned int portC;
-	unsigned int portD;
-	string command(string* str);
+	short int portA;
+	short int portB;
+	short int portC;
+	short int portD;
+	short int command(string* str);
 
 public:
 	OUSB() {
@@ -23,54 +23,20 @@ public:
 		portD = 0;
 	};
 
-	unsigned int getPORTA();
+	short int getPORTA();
 
-	unsigned int getPORTB();
+	short int getPORTB();
 
-	void setPORTB(unsigned int val);
+	void setPORTB(unsigned short int val);
 
-	unsigned int getPORTC();
+	short int getPORTC();
 
-	unsigned int getPORTD();
+	short int getPORTD();
 
-	void setPORTD(unsigned int val);
+	void setPORTD(unsigned short int val);
 };
 
-unsigned int OUSB::getPORTA() {
-	string commandPORTA = "ousb -r io porta";
-	portA = (unsigned int)stoi(command(&commandPORTA));
-	return portA;
-}
-
-unsigned int OUSB::getPORTB() {
-	string commandPORTB = "ousb -r io portb";
-	portB = (unsigned int)stoi(command(&commandPORTB));
-	return portB;
-}
-
-void OUSB::setPORTB(unsigned int val) {
-	string commandPORTB = "ousb -r io portb " + to_string(val);
-	portB = stoi(command(&commandPORTB));
-}
-
-unsigned int OUSB::getPORTC() {
-	string commandPORTC = "ousb -r io portc";
-	portC = (unsigned int)stoi(command(&commandPORTC));
-	return portC;
-}
-
-unsigned int OUSB::getPORTD() {
-	string commandPORTD = "ousb -r io portd";
-	portD = (unsigned int)stoi(command(&commandPORTD));
-	return portD;
-}
-
-void OUSB::setPORTD(unsigned int val) {
-	string commandPORTD = "ousb -r io portd " + to_string(val);
-	portD = stoi(command(&commandPORTD));
-}
-
-string OUSB::command(string* str)
+short int OUSB::command(string* str)
 {
 	FILE* fpipe;
 	char line[256] = {};
@@ -93,11 +59,46 @@ string OUSB::command(string* str)
 	if (output.find(errorCheck) != string::npos) {
 
 		cout << "Z" << endl;
+		return -1;
 	}
 
 
-	return output;
+	return atoi(line);
 
+}
+
+short int OUSB::getPORTA() {
+	string commandPORTA = "ousb -r io porta";
+	portA = command(&commandPORTA);
+	return portA;
+}
+
+short int OUSB::getPORTB() {
+	string commandPORTB = "ousb -r io portb";
+	portB = command(&commandPORTB);
+	return portB;
+}
+
+void OUSB::setPORTB(unsigned short int val) {
+	string commandPORTB = "ousb -r io portb " + to_string(val);
+	portB = command(&commandPORTB);
+}
+
+short int OUSB::getPORTC() {
+	string commandPORTC = "ousb -r io portc";
+	portC = command(&commandPORTC);
+	return portC;
+}
+
+short int OUSB::getPORTD() {
+	string commandPORTD = "ousb -r io portd";
+	portD = command(&commandPORTD);
+	return portD;
+}
+
+void OUSB::setPORTD(unsigned short int val) {
+	string commandPORTD = "ousb -r io portd " + to_string(val);
+	portD = command(&commandPORTD);
 }
 
 class trafficLight : public OUSB
@@ -126,7 +127,7 @@ public:
 
 	bool isGreen() { return greenLight ? true : false; };
 
-	void initState(string &colour);
+	void useState(string &colour);
 
 	void setState();
 };
@@ -152,7 +153,7 @@ void trafficLight::setGreen() {
 	greenLight = true;
 };
 
-void trafficLight::initState(string &colour) {
+void trafficLight::useState(string &colour) {
 	if (colour == "R") setRed();
 	else if (colour == "Y") setYellow();
 	else if (colour == "G") setGreen();
@@ -164,52 +165,80 @@ void trafficLight::setState() {
 	else if (isGreen()) setYellow();
 };
 
+int errorcheck(char* temp) {
+	for (int i = 0; temp[i] != '\0'; i++)
+	{
+		if (isdigit(temp[i]))
+			(void)0;
+
+		else
+		{
+			cout << "N" << endl;
+			return -1;
+		}
+	}
+	return atoi(temp);
+
+}
+
 
 int main(int argc, char* argv[])
 {
-	if (argc != 3) {
-		cout << "Incorrect # of args" << endl;
-		return 0;
-	}
+
+
+	OUSB ousb;
 
 	trafficLight light;
 
+
+
 	string colour = argv[1];
 
-	cout << colour << endl;
+	bool counter = false;
 
-	if (colour == "R" || colour == "r") {
-		colour = "R";
+
+	if (colour == "R" || colour == "Y" || colour == "G") void(0);
+
+
+
+	else if (colour == "CR" || colour == "CY" || colour == "CG") {
+		counter = true;
+		colour.erase(remove(colour.begin(), colour.end(), 'C'), colour.end());
 	}
-
-	else if (colour == "Y" || colour == "y") {
-		colour = "Y";
-	}
-
-	else if (colour == "G" || colour == "g") {
-		colour = "G";
-	}
-
 	else {
-		cout << "invalid first arg" << endl;
+		cout << "I" << endl;
 		return 0;
 	}
 
-	int transitions = atoi(argv[2]);
+	if (argc != 3) {
+		cout << "P" << endl;
+		return 0;
+	}
 
-	if (transitions > 50 || transitions < 0)
+	int transitions = errorcheck(argv[2]);
+
+	if (transitions == -1) return 0;
+
+	if (transitions > 15 || transitions < 0)
 	{
-		cout << "invalid # of state transitions" << endl;
+		cout << "R" << endl;
 
 		return 0;
 	}
 
-	light.initState(colour);
+	if (ousb.getPORTA() == -1) return 0; // check if ousb connected
 
-	for (int i = 0; i <= transitions; i++) {
+	light.useState(colour);
 
+
+	for (int i = 1; i <= transitions; i++) {
+
+		Sleep(1000);
 		light.setState();
+		
 	}
+
+	cout << ousb.getPORTB() << "," << ousb.getPORTD() << endl;
 	
 	return 0;
 	
